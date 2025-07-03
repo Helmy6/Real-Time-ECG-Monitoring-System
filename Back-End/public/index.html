@@ -1,0 +1,60 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECG Monitoring</title>
+</head>
+<body>
+    <h1>✅ Server is running!</h1>
+    <p>Welcome to the ECG Monitoring System</p>
+</body>
+</html> -->
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECG Monitoring</title>
+</head>
+<body>
+    <h1>✅ Server is running!</h1>
+    <p>Welcome to the ECG Monitoring System</p>
+
+    <div>
+        <p><strong>Voltage:</strong> <span id="voltage">--</span> V</p>
+        <p><strong>Heart Rate:</strong> <span id="heart_rate">--</span> BPM</p>
+        <p><strong>Diagnosis:</strong> <span id="diagnosis">--</span></p>
+        <p><strong>Confidence:</strong> <span id="confidence">--</span>%</p>
+    </div>
+
+    <script>
+        const ws = new WebSocket('ws://localhost:8100');
+
+        ws.onopen = () => {
+            console.log('✅ WebSocket Connected');
+        };
+
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            console.log('📩 Received:', data);
+
+            // تأكد من وجود كل القيم قبل العرض
+            document.getElementById('voltage').textContent = data.voltage ?? '--';
+            document.getElementById('heart_rate').textContent = data.heart_rate ?? '--';
+            document.getElementById('diagnosis').textContent = data.diagnosis ?? '--';
+            document.getElementById('confidence').textContent = data.confidence ?? '--';
+        };
+
+        ws.onerror = (err) => {
+            console.error('❌ WebSocket Error:', err);
+        };
+
+        ws.onclose = () => {
+            console.warn('🔌 WebSocket Disconnected');
+        };
+    </script>
+</body>
+</html> -->
+
+

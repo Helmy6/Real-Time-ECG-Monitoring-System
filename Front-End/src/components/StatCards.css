@@ -1,0 +1,22 @@
+.stat-cards {
+  margin-top: 20px;
+}
+
+.card {
+  text-align: center;
+  border-radius: 16px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+  min-height: 120px;
+}
+
+.heart-rate .MuiTypography-h4 {
+  color: #e53935;
+}
+
+.ai-status .MuiTypography-h5 {
+  color: #1e88e5;
+}
+
+.confidence-level .MuiTypography-h5 {
+  color: #43a047;
+}
