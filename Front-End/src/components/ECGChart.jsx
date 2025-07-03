@@ -183,7 +183,7 @@ export default function ECGChart({ setHR, setAI, setConfidence }) {
   const pointCounter = useRef(0);
 
   useEffect(() => {
-    socketRef.current = new WebSocket('ws://192.168.12.160:8100');
+    socketRef.current = new WebSocket(import.meta.env.VITE_BACKEND_WS_URL);
 
     socketRef.current.onopen = () => console.log('WebSocket connected!');
     socketRef.current.onerror = (err) => console.error('WebSocket error:', err);
