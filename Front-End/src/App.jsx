@@ -1,23 +1,3 @@
-// import { Routes, Route, Navigate } from 'react-router-dom';
-// import Login from './pages/Login';
-// import Signup from './pages/Signup';
-// import Dashboard from './pages/Dashboard';
-// import VitalSignsPage from './pages/VitalSignsPage';
-
-// function App() {
-//   return (
-//     <Routes>
-//       <Route path="/" element={<Navigate to="/login" />} />
-//       <Route path="/login" element={<Login />} />
-//       <Route path="/signup" element={<Signup />} />
-//       <Route path="/dashboard" element={<Dashboard />} />
-//       <Route path="/vitals" element={<VitalSignsPage />} />
-//     </Routes>
-//   );
-// }
-
-// export default App;
-
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';

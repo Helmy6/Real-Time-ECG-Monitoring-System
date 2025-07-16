@@ -169,8 +169,8 @@ import {
 } from 'recharts';
 import { Card, CardContent, Typography } from '@mui/material';
 
-const MAX_DATA_POINTS = 1250;
-const SAMPLING_RATE_HZ = 250;
+const MAX_DATA_POINTS = 250;
+const SAMPLING_RATE_HZ = 50;
 
 export default function ECGChart({ setHR, setAI, setConfidence }) {
   const [data, setData] = useState([]);
@@ -281,16 +281,6 @@ export default function ECGChart({ setHR, setAI, setConfidence }) {
                 fill: '#aaa',
               }}
             />
-            {/* <YAxis
-              domain={[yMin, yMax]}
-              stroke="#aaa"
-              label={{
-                value: 'ECG (mV)',
-                angle: -90,
-                position: 'insideLeft',
-                fill: '#aaa',
-              }}
-            /> */}
             <YAxis
               domain={[yMin, yMax]}
               stroke="#aaa"
