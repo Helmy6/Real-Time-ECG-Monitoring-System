@@ -1,15 +1,60 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Button, TextField, Typography, Container, Paper } from '@mui/material';
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  Container,
+  Paper,
+  IconButton,
+  InputAdornment,
+  CircularProgress
+} from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 export default function Signup() {
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: '', password: '' });
+  const [errors, setErrors] = useState({ email: '', password: '' });
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const validate = () => {
+    const newErrors = { email: '', password: '' };
+    let valid = true;
+
+    if (!form.email.trim()) {
+      newErrors.email = 'Email is required';
+      valid = false;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      newErrors.email = 'Enter a valid email';
+      valid = false;
+    }
+
+    if (!form.password.trim()) {
+      newErrors.password = 'Password is required';
+      valid = false;
+    } else if (form.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
+      valid = false;
+    }
+
+    setErrors(newErrors);
+    return valid;
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Accept all inputs for now, then redirect to login
-    navigate('/login');
+    if (validate()) {
+      setLoading(true);
+      // Simulate API call
+      setTimeout(() => {
+        setLoading(false);
+        // For now, just go to login after "sign up"
+        navigate('/login');
+      }, 1500);
+    }
   };
 
   return (
@@ -47,17 +92,40 @@ export default function Signup() {
               margin="normal"
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
+              error={Boolean(errors.email)}
+              helperText={errors.email}
             />
             <TextField
               fullWidth
               label="Password"
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               margin="normal"
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
+              error={Boolean(errors.password)}
+              helperText={errors.password}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowPassword(!showPassword)}
+                      edge="end"
+                      aria-label="toggle password visibility"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
-            <Button fullWidth variant="contained" type="submit" sx={{ mt: 2 }}>
-              Sign Up
+            <Button
+              fullWidth
+              variant="contained"
+              type="submit"
+              sx={{ mt: 2 }}
+              disabled={loading}
+            >
+              {loading ? <CircularProgress size={24} color="inherit" /> : 'Sign Up'}
             </Button>
             <Button
               fullWidth
