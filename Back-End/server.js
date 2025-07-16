@@ -3,16 +3,23 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const http = require('http');
 const WebSocket = require('ws');
+const cors = require('cors'); 
 
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
+// CORS middleware
+app.use(cors({
+    origin: 'https://real-time-ecg-monitoring-system.vercel.app/login', 
+    credentials: true
+}));
+
 // Middleware
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ✅ Root route to fix "Cannot GET /"
+// Root route to verify server is running
 app.get('/', (req, res) => {
     res.send('✅ WebSocket Server Running');
 });
@@ -31,7 +38,7 @@ app.post('/api/ecg', (req, res) => {
         Confidence: confidence
     };
 
-    // Broadcast to all WebSocket clients
+    // Broadcast data to all WebSocket clients
     wss.clients.forEach(client => {
         if (client.readyState === WebSocket.OPEN) {
             client.send(JSON.stringify(formattedData));
@@ -41,7 +48,7 @@ app.post('/api/ecg', (req, res) => {
     res.status(200).json({ message: 'ECG Data Received Successfully' });
 });
 
-// WebSocket server connection
+// WebSocket connection handler
 wss.on('connection', ws => {
     console.log('⚡ New WebSocket Connection');
 
