@@ -27,7 +27,7 @@ export default function ECGChart({ setHR, setAI, setConfidence }) {
   const batchBuffer = useRef([]);
 
   useEffect(() => {
-    socketRef.current = new WebSocket('ws://10.29.97.160:8100');
+    socketRef.current = new WebSocket(import.meta.env.VITE_BACKEND_WS_URL);
 
     socketRef.current.onopen = () => console.log('WebSocket connected!');
     socketRef.current.onerror = (err) => console.error('WebSocket error:', err);
