@@ -11,7 +11,7 @@ const wss = new WebSocket.Server({ server });
 
 // CORS middleware
 app.use(cors({
-    origin: 'https://real-time-ecg-monitoring-system.vercel.app/login', 
+    origin: 'https://real-time-ecg-monitoring-system.vercel.app/login/', 
     credentials: true
 }));
 
