@@ -1,79 +1,89 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   LineChart,
   Line,
   XAxis,
   YAxis,
-  CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  CartesianGrid,
   Scatter,
 } from 'recharts';
 import { Card, CardContent, Typography } from '@mui/material';
 
-const WINDOW_SIZE = 250;
-const SAMPLING_RATE_HZ = 250; 
-
+// Change here
+const WINDOW_SIZE = 250;        // Show 250 samples per chart
+const UPDATE_INTERVAL = 250;    // Update every 250 new samples
 
 export default function ECGChart({ setHR, setAI, setConfidence }) {
   const [data, setData] = useState([]);
   const [rPeaks, setRPeaks] = useState([]);
+  const socketRef = useRef(null);
+
   const prevHR = useRef(null);
   const prevAI = useRef(null);
   const prevConfidence = useRef(null);
-  const socketRef = useRef(null);
-  const pointCounter = useRef(0);
+  const sampleCounter = useRef(0);
+  const batchBuffer = useRef([]);
 
   useEffect(() => {
     socketRef.current = new WebSocket(import.meta.env.VITE_BACKEND_WS_URL);
+
+    socketRef.current.onopen = () => console.log('WebSocket connected!');
+    socketRef.current.onerror = (err) => console.error('WebSocket error:', err);
+    socketRef.current.onclose = (event) => console.log('WebSocket closed:', event);
 
     socketRef.current.onmessage = (event) => {
       try {
         const message = JSON.parse(event.data);
 
-        const ecgValues = Array.isArray(message.ECG)
-          ? message.ECG.map((v) => parseFloat(v))
-          : [parseFloat(message.ECG)];
+        if (
+          !message ||
+          !Array.isArray(message.ECG) ||
+          message.HR === undefined ||
+          message.AI === undefined ||
+          message.Confidence === undefined
+        ) {
+          console.warn('Unrecognized message format:', event.data);
+          return;
+        }
 
-        const hrValue = parseFloat(message.HR);
-        const aiValue = message.AI;
+        const filteredSignal = message.ECG;
+        const hrValue = parseInt(message.HR);
+        const aiValue = message.AI.trim();
         const confidenceValue = parseFloat(message.Confidence);
 
-        // Stream multiple ECG points
-        ecgValues.forEach((ecgValue) => {
-          const timeInSeconds = pointCounter.current / SAMPLING_RATE_HZ;
-          pointCounter.current += 1;
-
-          setData((prevData) => {
-            const newData = [...prevData, { sample: timeInSeconds, ecg: ecgValue }];
-            return newData.slice(-MAX_DATA_POINTS);
+        filteredSignal.forEach((ecgValue) => {
+          batchBuffer.current.push({
+            sample: sampleCounter.current++,
+            ecg: ecgValue,
           });
+
+          if (batchBuffer.current.length === UPDATE_INTERVAL) {
+            const latestChunk = [...batchBuffer.current];
+            batchBuffer.current = [];
+            setData(latestChunk);
+          }
         });
 
-        setRPeaks([]); // Optional: clear peaks (or update based on AI results)
+        setRPeaks([]); // Optional: highlight peaks
 
-        // Update HR if significant change
         if (prevHR.current === null || Math.abs(hrValue - prevHR.current) > 3) {
           setHR(hrValue);
           prevHR.current = hrValue;
         }
 
-        // Update Confidence if change > 5
-        if (
-          prevConfidence.current === null ||
-          Math.abs(confidenceValue - prevConfidence.current) > 5
-        ) {
+        if (prevConfidence.current === null || Math.abs(confidenceValue - prevConfidence.current) > 5) {
           setConfidence(confidenceValue);
           prevConfidence.current = confidenceValue;
         }
 
-        // Update AI diagnosis if changed
         if (prevAI.current !== aiValue) {
           setAI(aiValue);
           prevAI.current = aiValue;
         }
       } catch (err) {
-        console.error('❌ Error parsing WebSocket message:', err);
+        console.error('Error parsing WebSocket message:', err);
       }
     };
 
@@ -138,7 +148,7 @@ export default function ECGChart({ setHR, setAI, setConfidence }) {
                 color: '#00FF00',
               }}
               formatter={(value, name) => {
-                if (name === 'sample') return [value + ' s', 'Sample'];
+                if (name === 'sample') return [value + ' samples', 'Sample'];
                 return [value.toFixed(3) + ' mV', 'ECG'];
               }}
               labelFormatter={(value) => `Sample: ${value}`}
@@ -157,4 +167,5 @@ export default function ECGChart({ setHR, setAI, setConfidence }) {
     </Card>
   );
 }
+
 
